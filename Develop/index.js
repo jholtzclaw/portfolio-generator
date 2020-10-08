@@ -1,70 +1,162 @@
-const inquirer = require('inquirer');
-const fs = require("fs");
-const path = require("path");
-const generateMarkdown = require("./utils/generateMarkdown");
-
-// array of questions for user
-const questions = [
-    {
-        type: "input",
-        name: "github",
-        message: "What is your GitHub username?"
-      },{
-        type: "input",
-        name: "email",
-        message: "What is your email address?"
-      },
-      {
-        type: "input",
-        name: "title",
-        message: "What is your project's name?"
-      },
-      {
-        type: "input",
-        name: "description",
-        message: "Please write a short description of your project"
-      },
-      {
-        type: "list",
-        name: "license",
-        message: "What kind of license should your project have?",
-        choices: ["MIT", "APACHE 2.0", "GPL 3.0", "BSD 3", "None"]
-      },
-      {
-        type: "input",
-        name: "installation",
-        message: "What command should be run to install dependencies?",
-        default: "npm i"
-      },
-      {
-        type: "input",
-        name: "test",
-        message: "What command should be run to run tests?",
-        default: "npm test"
-      },
-      {
-        type: "input",
-        name: "usage",
-        message: "What does the user need to know about using the repo?",
-      },
-      {
-        type: "input",
-        name: "contributing",
-        message: "What does the user need to know about contributing to the repo?",
-      }
-    ]
-// function to write README file
-function writeToFile(fileName, data) {
-    return fs.writeFileSync(path.join(process.cwd(), fileName), data)
+// allows use of inquirer
+const inquirer = require('inquirer')
+// imports writeFile functions
+const writeFile = require('./utils/generateMarkdown')
+// imports markdown functions
+const generateReadme = require('./utils/markdownTemplate')
+// function to users to enter information
+const promptUser = () => {
+    return inquirer.prompt([
+        {
+            type: 'input',
+            name: 'projectTitle',
+            message: 'Please, enter your project title.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter a title!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'description',
+            message: 'Enter your project description.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter a description!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'installation',
+            message: 'Provide steps required to install your project.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter installation steps!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'usage',
+            message: 'Provide instructions and possible uses for your project.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter instructions and uses!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'credits',
+            message: 'Enter your collaborators and other assets used to complete your project.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter your collaborators!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'checkbox',
+            name: 'license',
+            message: 'Please, select your license?',
+            choices: [
+                'Apache', 
+                'BSD',  
+                'GPL', 
+                'LGPL', 
+                'MIT',
+                'MPL',
+                'CDDL',
+                'EPL'
+                ]
+        },
+        {
+            type: 'input',
+            name: 'contributing',
+            message: 'Provide instructions on how to contribute.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter how to contribute!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'tests',
+            message: 'Provide your tests.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter available tests!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'username',
+            message: 'Enter your GitHub username.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter GitHub username!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'email',
+            message: 'Enter an email address.',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('Please enter an email address!')
+                    return false;
+                }
+            }
+        }
+    ])
 }
 
-// function to initialize (start) program
-function init() {
-    inquirer.prompt(questions)
-    .then(answers => {
-        writeToFile('README.md', generateMarkdown({...answers}))
-    })
-}
-
-// function call to initialize program
-init();
+// call to run the program
+promptUser()
+//.then(answers => console.log(answers))
+// pulls the data
+.then(projectData => {
+     return generateReadme(projectData);
+})
+//writes the file
+.then(pageMarkdown => {
+    return writeFile(pageMarkdown)
+})
+.then(writeFileResponse => {
+    console.log(writeFileResponse)
+})
+//catches errors
+.catch(err => {
+    console.log(err)
+})

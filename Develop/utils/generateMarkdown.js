@@ -1,20 +1,17 @@
+// allows use of fs
+const fs = require('fs')
 // function to generate markdown for README
-function generateMarkdown(data) {
-  return `# ${data.title}
-${displayBadge(data.license)}
-
-## Description
-
-${data.description}
-`;
+module.exports = fileContent => {
+  return new Promise ((resolve, reject) => {
+    fs.writeFile('./dist/README1.md', fileContent, err => {
+      if (err) {
+        reject(err)
+        return;
+      }
+      resolve({
+        ok: true,
+        message: 'Readme created'
+      })
+    })
+  })
 }
-
-
-function displayBadge(license) {
-  if(license !== 'None') {
-    return `![GitHub license](https://img.shields.io/badge/license-${license}-blue.svg)`
-  }
-  return ``
-}
-
-module.exports = generateMarkdown;
